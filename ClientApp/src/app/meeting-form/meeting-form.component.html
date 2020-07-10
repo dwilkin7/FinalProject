@@ -1,0 +1,45 @@
+<form [formGroup]="meetingForm" (ngSubmit)="onSubmit()">
+
+
+  <label>Conducting</label><br />
+  <input formControlName="conductor" /><br />
+
+  <label>Opening Prayer</label><br />
+  <input formControlName="openingPrayer" /><br />
+
+  <label>Closing Prayer</label><br />
+  <input formControlName="closingPrayer" /><br />
+
+  <div formArrayName="speakers">
+    <div class="formGroup" *ngFor="let speakerControl of getControls(); let i = index">
+      <label>Speaker {{i+1}}</label><br />
+      <input formControlName="speakers" [formControlName]="i" /><br />
+    </div>
+    <button class="speakerBtn" type="button" (click)="onAddSpeaker()">Add<br>Speaker</button>
+    <button *ngIf="removeSpeaker" class="speakerBtn" type="button" (click)="onRemoveSpeaker()">Remove<br>Speaker</button>
+  </div>
+
+  <label>Meeting Date</label><br />
+  <input type="date" formControlName="meetingDate" id="start" name="trip-start"><br />
+
+  <label>Topic</label><br />
+  <input formControlName="topic" /><br />
+
+  <label>Opening Hymn</label><br />
+  <input formControlName="openingHymn" /><br />
+
+  <label>Sacrament Hymn</label><br />
+  <input formControlName="sacramentHymn" /><br />
+
+  <label>Closing Hymn</label><br />
+  <input formControlName="closingHymn" /><br />
+
+  <label>Intermediate Hymn</label><br />
+  <input formControlName="intermediateHymn" /><br />
+
+  <button type="submit" *ngIf="!editMode">Create Meeting</button>
+  <button type="submit" *ngIf="editMode">Update Meeting</button>
+  <button type="button" *ngIf="editMode" routerLink="../../">Cancel</button>
+  <button type="button" *ngIf="!editMode" routerLink="../">Cancel</button>
+
+</form>

@@ -1,0 +1,42 @@
+<div *ngIf="outlet.isActivated == false">
+
+  <h1>Sacrament Meeting</h1>
+
+  <a routerLink="../new">New Meeting</a>
+
+  <h2>Add New</h2>
+  <table class='table table-striped' aria-labelledby="tableLabel" *ngIf="meetings">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Theme</th>
+        <th>Conducting</th>
+        <th>Opening Hymn</th>
+        <th>Opening Prayer</th>
+        <th>Sacrament Hymn</th>
+        <th>Speakers</th>
+        <th>Intermediate Hymn</th>
+        <th>Closing Prayer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let meeting of meetings">
+        <td>{{ meeting.meetingDate }}</td>
+        <td>{{ meeting.topic }}</td>
+        <td>{{ meeting.conductor }}</td>
+        <td>{{ meeting.openingHymn }}</td>
+        <td>{{ meeting.openingPrayer }}</td>
+        <td>{{ meeting.sacramentHymn }}</td>
+        <td> <span *ngFor="let speaker of meeting.speakers"> {{"• " + speaker }} <br /> </span> </td>
+        <td *ngIf="meeting.intermediateHymn; else elseBlock">{{ meeting.intermediateHymn }}</td>
+        <ng-template #elseBlock>None</ng-template>
+        <td>{{ meeting.closingPrayer }}</td>
+        <td><span> <a (click)="print(meeting.id)"[routerLink]="[meeting.id, 'edit']">Edit</a> <a> Delete</a></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<router-outlet #outlet="outlet"></router-outlet>
