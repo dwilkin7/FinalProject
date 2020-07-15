@@ -11,7 +11,7 @@
     <div class="formWrap">
       <div formArrayName="speakers">
         <div class="formGroup" *ngFor="let speakerControl of getControls(); let i = index">
-          <div>
+          <div class="speakerTopic">
             <label>Speaker {{i+1}}</label><br />
             <input formControlName="speakers" [formControlName]="i" /><br />
           </div>
@@ -20,7 +20,7 @@
 
       <div formArrayName="topic">
         <div class="formGroup" *ngFor="let topicControl of getTopics(); let i = index">
-          <div>
+          <div class="speakerTopic">
             <label>Topic {{i+1}}</label><br />
             <input formControlName="topic" [formControlName]="i" /><br />
           </div>
@@ -29,7 +29,7 @@
     </div>
 
   <button class="speakerBtn" type="button" (click)="onAddSpeaker()">Add<br>Speaker</button>
-  <button *ngIf="removeSpeaker" class="speakerBtn" type="button" (click)="onRemoveSpeaker()">Remove<br>Speaker</button>
+  <button *ngIf="removeSpeaker" class="removeBtn" type="button" (click)="onRemoveSpeaker()">Remove<br>Speaker</button>
   <br />
   <!--
     <label>Topic</label><br />
@@ -51,10 +51,10 @@
   <label>Intermediate Hymn</label><br />
   <input formControlName="intermediateHymn" /><br />
 
-  <button type="submit" *ngIf="!editMode" [disabled]="!meetingForm.valid">Create Meeting</button>
-  <button type="button" *ngIf="!editMode" routerLink="../">Cancel</button>
+  <button class="addUpdateBtn" type="submit" *ngIf="!editMode" [disabled]="!meetingForm.valid">Create Meeting</button>
+  <button class="removeBtn" type="button" *ngIf="!editMode" routerLink="../">Cancel</button>
 
-  <button type="submit" *ngIf="editMode" [disabled]="!meetingForm.valid" >Update Meeting</button>
-  <button type="button" *ngIf="editMode" routerLink="../../">Cancel</button>
+  <button class="addUpdateBtn" type="submit" *ngIf="editMode" [disabled]="!meetingForm.valid" >Update Meeting</button>
+  <button class="removeBtn" type="button" *ngIf="editMode" routerLink="../../">Cancel</button>
 
 </form>

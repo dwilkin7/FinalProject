@@ -18,3 +18,11 @@ code {
 .speakTopics{
     width: 15em;
 }
+
+h1 {
+  font-family: 'EB Garamond', serif;
+}
+
+td {
+  font-family: 'Open Sans', sans-serif;
+}

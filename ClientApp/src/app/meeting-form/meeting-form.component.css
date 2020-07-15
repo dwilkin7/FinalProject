@@ -6,3 +6,34 @@ input{
     display: flex;
     flex-direction: row;
 }
+
+.speakerBtn {
+  background-color: #008CBA;
+  padding: 5px;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.removeBtn {
+  background-color: #f44336;
+  padding: 5px;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.addUpdateBtn {
+  background-color: #4CAF50;
+  padding: 5px;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.speakerTopic {
+    margin: 5px;
+}
