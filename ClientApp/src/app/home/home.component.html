@@ -9,12 +9,11 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Theme</th>
         <th>Conducting</th>
         <th>Opening Hymn</th>
         <th>Opening Prayer</th>
         <th>Sacrament Hymn</th>
-        <th>Speakers</th>
+        <th>Speakers/Theme</th>
         <th>Intermediate Hymn</th>
         <th>Closing Prayer</th>
         <th>Actions</th>
@@ -22,17 +21,17 @@
     </thead>
     <tbody>
       <tr *ngFor="let meeting of meetings">
-        <td>{{ meeting.meetingDate }}</td>
-        <td>{{ meeting.topic }}</td>
+        <td>{{ meeting.meetingDate | date }}</td>
         <td>{{ meeting.conductor }}</td>
         <td>{{ meeting.openingHymn }}</td>
         <td>{{ meeting.openingPrayer }}</td>
         <td>{{ meeting.sacramentHymn }}</td>
-        <td> <span *ngFor="let speaker of meeting.speakers"> {{"• " + speaker }} <br /> </span> </td>
+        <!--<span *ngFor="let topic of meeting.topic"> <br /> </span> -->
+        <td class="speakTopics"> <span *ngFor="let speaker of meeting.speakers let i = index"> {{"• " + speaker + " — " + meeting.topic[i]  }} <br /> </span> </td>
         <td *ngIf="meeting.intermediateHymn; else elseBlock">{{ meeting.intermediateHymn }}</td>
         <ng-template #elseBlock>None</ng-template>
         <td>{{ meeting.closingPrayer }}</td>
-        <td><span> <a (click)="print(meeting.id)"[routerLink]="[meeting.id, 'edit']">Edit</a> <a> Delete</a></span></td>
+        <td><span> <a [routerLink]="[meeting.id, 'edit']">Edit</a> <a (click)="deleteMeeting(meeting.id)" href="javascript:void(0);"> Delete</a></span></td>
       </tr>
     </tbody>
   </table>

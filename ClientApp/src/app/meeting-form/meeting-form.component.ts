@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Meeting } from '../meetings.model';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-meeting-form',
@@ -13,16 +13,16 @@ export class MeetingFormComponent implements OnInit {
 
 
 
-  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) { }
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,
+    @Inject('BASE_URL') private baseUrl: string) { }
 
   removeSpeaker = false;
-  date: string = "";
   meetingForm: FormGroup;
   editMode: boolean = false;
   id: string = "";
   originalMeeting: Meeting;
   meeting: Meeting;
-  meetings: Meeting[] = [];
+  //_id: string = "";
 
   //constructor(private router: Router, private route: ActivatedRoute, http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
   //  http.get<Meeting[]>('https://localhost:44334/api/meetings').subscribe(result => {
@@ -32,19 +32,58 @@ export class MeetingFormComponent implements OnInit {
 
   
 
-  ngOnInit() {    const promise = new Promise((resolve, reject) => {      this.getMeetings();
+  ngOnInit() {
 
-      if (this.meetings != null || this.meetings != undefined && this.getMeetings()) {
-        resolve('Should have stuff');
-      } else {
-        reject('failed');
+    this.route.params.subscribe((params: Params) => {
+
+      this.id = params.id;
+
+      if (!this.id) {
+        this.editMode = false;
+        console.log(this.editMode);
+        return;
       }
-    });    promise.then((message) => {      
-    });    console.log(this.meetings);    this.route.params.subscribe((params: Params) => {      this.id = params.id;      if (this.id === null || this.id === undefined) {        this.editMode = false;        console.log(this.editMode);        return;      }      this.originalMeeting = this.getMeeting(this.id);      if (this.originalMeeting === null) {        return;      }      this.editMode = true;      this.meeting = this.originalMeeting;       //console.log(this.meeting);       console.log(this.editMode);    })
 
-    console.log("Edit Mode: " + this.editMode);
+      this.editMode = true;
+      console.log(this.editMode);
+    });
 
-    this.initForm();
+    if (this.editMode) {
+      this.getMeeting();
+
+    } else {
+
+      let arr: string[] = [];
+      this.meeting = new Meeting('1', '2', '3', '4', arr, '6', arr, '8', '9', '10', '11');
+
+      //let date = new Date;
+      //this.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+
+      this.meetingForm = new FormGroup({
+        //'id': new FormControl(null, Validators.required),
+        'conductor': new FormControl(null, Validators.required),
+        'openingPrayer': new FormControl(null, Validators.required),
+        'closingPrayer': new FormControl(null, Validators.required),
+        'speakers': new FormArray([]),
+        'meetingDate': new FormControl(null, Validators.required),
+        'topic': new FormArray([]),
+        'openingHymn': new FormControl(null, Validators.required),
+        'sacramentHymn': new FormControl(null, Validators.required),
+        'closingHymn': new FormControl(null, Validators.required),
+        'intermediateHymn': new FormControl(null)
+      });
+
+      this.meetingForm.patchValue({
+        'conductor': '',
+        'openingPrayer': '',
+        'closingPrayer': '',
+        'meetingDate': '',
+        'openingHymn': '',
+        'sacramentHymn': '',
+        'closingHymn': '',
+        'intermediateHymn': ''
+      });
+    }
 
   }
 
@@ -57,33 +96,28 @@ export class MeetingFormComponent implements OnInit {
   }
    */
 
-  getMeetings() {
-    this.http.get<Meeting[]>('https://localhost:44334/api/meetings').subscribe(
+  getMeeting() {
+    this.http.get<Meeting>(this.baseUrl + 'api/meetings/' + this.id).subscribe(
       (response) => {
-        this.meetings = response;
-        console.log(response);
-        console.log(this.meetings);
-        return true;
+        this.meeting = response;
+
+        if (this.meeting) {
+          this.originalMeeting = this.meeting;
+
+          //this.editMode = true;
+        }
+        this.initForm();
       }
     ),
       (error: any) => {
         console.log(error);
-        return false;
-      }
-  }
-
-    getMeeting(id: string) {
-      for (let meeting of this.meetings) {
-        if (meeting.id === id) {
-          return meeting;
-        }
       }
   }
 
   onSubmit() {
 
     let newMeeting = new Meeting(
-      this.meetingForm.value['id'],
+      this.id,
       this.meetingForm.value['conductor'],
       this.meetingForm.value['openingPrayer'],
       this.meetingForm.value['closingPrayer'],
@@ -96,15 +130,11 @@ export class MeetingFormComponent implements OnInit {
       this.meetingForm.value['intermediateHymn']
     );
 
-    newMeeting.id = "5";
+    //newMeeting.id = "5";
 
     console.log(newMeeting);
 
-    if (this.editMode) {
-      //Update Meeting
-    } else {
       this.addMeeting(newMeeting);
-    }
   }
 
   //Add meeting
@@ -112,20 +142,63 @@ export class MeetingFormComponent implements OnInit {
     if (!meeting) {
       return;
     }
-    const headers = new HttpHeaders({ 'Content_Type': 'application/json' });
-    meeting.id = '';
-    this.http.post<{ message: string, meeting: Meeting }>('http://localhost:44334/api/meetings',
-      meeting, { headers: headers })
-      .subscribe(
-        (responseData) => {
-          this.meetings.push(responseData.meeting);
-          //this.sortAndSend();
-        }
-      );
+
+    if (!this.editMode) {
+      //Create new
+      //const strMeeting = JSON.stringify(meeting);
+      console.log("Adding new...");
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+      meeting._Id = '';
+      this.http.post(this.baseUrl + 'api/meetings/', meeting)
+        .subscribe((responseData) => {
+          this.router.navigate(['../'], { relativeTo: this.route });
+          });
+    } else {
+      console.log(meeting._Id);
+      console.log(this.id);
+
+      meeting._Id = this.id;
+      //Update
+
+     // const strMeeting = JSON.stringify(meeting);
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+      this.http.put(this.baseUrl + 'api/meetings/' + this.id, meeting, { headers: headers })
+        .subscribe((responseData) => {
+          //this.meeting = ;
+          console.log(responseData);
+          this.router.navigate(['../../'], { relativeTo: this.route });
+          });
+    }
   }
 
 
+  //editMeeting(meet: Meeting) {
+  //  const params = new HttpParams().set('Id', meet._Id);
+  //  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  //  var body = {
+  // _Id: meet._Id,
+  // conductor: meet.conductor,
+  // openingPrayer: meet.openingPrayer,
+  // closingPrayer: meet.closingPrayer,
+  // speakers: meet.speakers,
+  // meetingDate: meet.meetingDate,
+  // topic: meet.topic,
+  // openingHymn: meet.openingHymn,
+  // sacramentHymn: meet.sacramentHymn,
+  // closingHymn: meet.closingHymn,
+  // intermediateHymn: meet.intermediateHymn
+  //  }
+  //  return this.http.put<Meeting>(this.baseUrl + 'api/meetings/' + this.id, Meeting, { headers, params }
+  //  )
+  //}
 
+  //this.http.put('http://localhost:3000/messages/', messages, { headers: headers })
+  //.subscribe(
+  //  () => {
+  //    this.messageChangeEvent.next(this.messages.slice());
+  //  }
+  //);
 
   private initForm() {
 
@@ -138,7 +211,7 @@ export class MeetingFormComponent implements OnInit {
         'closingPrayer': new FormControl(null, Validators.required),
         'speakers': new FormArray([]),
         'meetingDate': new FormControl(null, Validators.required),
-        'topic': new FormControl(null, Validators.required),
+        'topic': new FormArray([]),
         'openingHymn': new FormControl(null, Validators.required),
         'sacramentHymn': new FormControl(null, Validators.required),
         'closingHymn': new FormControl(null, Validators.required),
@@ -154,48 +227,57 @@ export class MeetingFormComponent implements OnInit {
         (<FormArray>this.meetingForm.get('speakers')).push(control);
       });
 
-      this.meetingForm.patchValue({
-        'conductor': this.meeting.conductor,        'openingPrayer': this.meeting.openingPrayer,        'closingPrayer': this.meeting.closingPrayer,        'meetingDate': this.meeting.meetingDate,        'topic': this.meeting.topic,        'openingHymn': this.meeting.openingHymn,        'sacramentHymn': this.meeting.sacramentHymn,        'closingHymn': this.meeting.closingHymn,        'intermediateHymn': this.meeting.intermediateHymn
-      });
-
-      this.date = this.meeting.meetingDate;
-
-    } else {
-
-      let date = new Date;
-      this.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
-
-      this.meetingForm = new FormGroup({
-        //'id': new FormControl(null, Validators.required),
-        'conductor': new FormControl(null, Validators.required),
-        'openingPrayer': new FormControl(null, Validators.required),
-        'closingPrayer': new FormControl(null, Validators.required),
-        'speakers': new FormArray([]),
-        'meetingDate': new FormControl(null, Validators.required),
-        'topic': new FormControl(null, Validators.required),
-        'openingHymn': new FormControl(null, Validators.required),
-        'sacramentHymn': new FormControl(null, Validators.required),
-        'closingHymn': new FormControl(null, Validators.required),
-        'intermediateHymn': new FormControl(null)
+      this.meeting.topic.forEach(element => {
+        const control = new FormControl(element, Validators.required);
+        (<FormArray>this.meetingForm.get('topic')).push(control);
       });
 
       this.meetingForm.patchValue({
-        'conductor': '',
-        'openingPrayer': '',
-        'closingPrayer': '',
-        'speakers': '',
-        'meetingDate': '',
-        'topic': '',
-        'openingHymn': '',
-        'sacramentHymn': '',
-        'closingHymn': '',
-        'intermediateHymn': ''
+        'conductor': this.meeting.conductor,
+        'openingPrayer': this.meeting.openingPrayer,
+        'closingPrayer': this.meeting.closingPrayer,
+        'meetingDate': this.meeting.meetingDate,
+        'openingHymn': this.meeting.openingHymn,
+        'sacramentHymn': this.meeting.sacramentHymn,
+        'closingHymn': this.meeting.closingHymn,
+        'intermediateHymn': this.meeting.intermediateHymn
       });
     }
   }
 
 
-  /**************************** Add Speaker stuff****************************/  onAddSpeaker() {    this.removeSpeaker = true;    const control = new FormControl('', Validators.required);    (<FormArray>this.meetingForm.get('speakers')).push(control);  }  onRemoveSpeaker() {    const length = (<FormArray>this.meetingForm.get('speakers')).length;    if ((length - 1) === 0) { this.removeSpeaker = false; }    (<FormArray>this.meetingForm.get('speakers')).removeAt(length - 1);  }  getControls() {    return (<FormArray>this.meetingForm.get('speakers')).controls;  }
+  /***************************
+* Add Speaker stuff
+****************************/
+  onAddSpeaker() {
+    this.removeSpeaker = true;
+    const control = new FormControl('', Validators.required);
+    (<FormArray>this.meetingForm.get('speakers')).push(control);
+
+    const control2 = new FormControl('', Validators.required);
+    (<FormArray>this.meetingForm.get('topic')).push(control2);
+  }
+
+  onRemoveSpeaker() {
+    const length = (<FormArray>this.meetingForm.get('speakers')).length;
+    if ((length - 1) === 0) { this.removeSpeaker = false; }
+
+    (<FormArray>this.meetingForm.get('speakers')).removeAt(length - 1);
+
+    /////////////////////////////////////////////////////////////////////////////////
+
+    const length2 = (<FormArray>this.meetingForm.get('topic')).length;
+    if ((length2 - 1) === 0) { this.removeSpeaker= false; }
+
+    (<FormArray>this.meetingForm.get('topic')).removeAt(length2 - 1);
+  }
+  getControls() {
+    return (<FormArray>this.meetingForm.get('speakers')).controls;
+  }
+
+  getTopics() {
+    return (<FormArray>this.meetingForm.get('topic')).controls;
+  }
 
 
 }

@@ -28,7 +28,7 @@ namespace FinalProject.Models
         public DateTime MeetingDate { get; set; }
 
         //[BsonElement("Topic")]
-        public string Topic { get; set; }
+        public string[] Topic { get; set; }
 
 
         //[BsonElement("Opening Hymn")]

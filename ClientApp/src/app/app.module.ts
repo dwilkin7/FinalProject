@@ -10,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { MeetingFormComponent } from './meeting-form/meeting-form.component';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -27,7 +28,7 @@ import { MeetingFormComponent } from './meeting-form/meeting-form.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: '', redirectTo: '/home', pathMatch: 'full' },
       {
         path: 'home', component: HomeComponent, children: [
           { path: ':id/edit', component: MeetingFormComponent }
@@ -43,7 +44,7 @@ import { MeetingFormComponent } from './meeting-form/meeting-form.component';
       { path: 'fetch-data', component: FetchDataComponent },
     ])
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
