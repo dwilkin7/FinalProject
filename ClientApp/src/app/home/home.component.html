@@ -30,7 +30,7 @@
         <td *ngIf="meeting.intermediateHymn; else elseBlock">{{ meeting.intermediateHymn }}</td>
         <ng-template #elseBlock>None</ng-template>
         <td>{{ meeting.closingPrayer }}</td>
-        <td><span> <a [routerLink]="[meeting.id, 'edit']">Edit</a> <a (click)="deleteMeeting(meeting.id)" href="javascript:void(0);"> Delete</a></span></td>
+        <td><span> <a [routerLink]="['../', meeting.id, 'edit']">Edit</a> <a (click)="deleteMeeting(meeting.id)" href="javascript:void(0);"> Delete</a></span></td>
       </tr>
     </tbody>
   </table>

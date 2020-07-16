@@ -29,11 +29,10 @@ import { DatePipe } from '@angular/common';
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', redirectTo: '/home', pathMatch: 'full' },
-      {
-        path: 'home', component: HomeComponent, children: [
-          { path: ':id/edit', component: MeetingFormComponent }
-        ]
-      },
+      { path: 'home', component: HomeComponent },
+
+      { path: ':id/edit', component: MeetingFormComponent },
+
       {
         path: 'meetingForm', component: MeetingFormComponent, children: [
           //{ path: ':id/edit', component: MeetingFormComponent }

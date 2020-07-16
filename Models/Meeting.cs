@@ -9,6 +9,7 @@ namespace FinalProject.Models
     public class Meeting
     {
         [BsonId]
+        [BsonIgnoreIfDefault]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
